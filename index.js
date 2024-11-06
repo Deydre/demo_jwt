@@ -4,7 +4,7 @@ const express = require("express"),
 
 // Clave privada para firmar los Tokens
 // Guardar la clave en la BBDD
-const config = {
+const config = { // -- ESTO DEBERÍA ESTAR EN EL .env
   llave: "miclaveultrasecreta123*",
 };
 
@@ -35,14 +35,14 @@ POST /autenticar
 } 
 */
 app.post("/autenticar", (req, res) => {
-  if (req.body.usuario === "alex" && req.body.contrasena === "123456") {
+  if (req.body.usuario === "alex" && req.body.contrasena === "123456") { // -- EA LÍNEA DEBERÍA HACER UNA CONSULTA A LA BBDD Y VER SI EXISTEN
     const payload = {
       check: true,
       user: "alex",
-      password_banco: "123456",
+      password_banco: "123456", // -- LA PASS NO PONERLA AQUÍ
     };
-    const token = jwt.sign(payload, app.get("llave"), {
-      expiresIn: "60000ms", // 30 segundos para que expire
+    const token = jwt.sign(payload, app.get("llave"), { // -- ESTO GENERA EL TOKEN
+      expiresIn: "60000ms", // 60 segundos para que expire
     });
     res.json({
       mensaje: "Autenticación correcta",
@@ -58,10 +58,10 @@ app.post("/autenticar", (req, res) => {
 // Rellenar cabecera access-token en la petición de postman
 const rutasProtegidas = express.Router();
 rutasProtegidas.use((req, res, next) => {
-  const token = req.headers["access-token"];
+  const token = req.headers["access-token"]; // -- EXTRAE EL TOKEN RECIBIDO EN LA CABECERA
 
-  if (token) {
-    jwt.verify(token, app.get("llave"), (err, decoded) => {
+  if (token) { 
+    jwt.verify(token, app.get("llave"), (err, decoded) => { // -- COMPARAMOS EL TOKEN CON LA CLAVE ULTRASECRETA
       if (err) {
         return res.json({ mensaje: "Token inválida" });
       } else {
